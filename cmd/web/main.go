@@ -2,59 +2,46 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/MiniTeks/mks-ui/pkg/db"
 )
 
-type mksresource struct {
-	Created   int
-	Active    int
-	Failed    int
-	Completed int
-	Deleted   int
-}
-
-type application struct {
-	Mkstask, Mkspipelinerun, Mkstaskrun mksresource
-}
+var (
+	dbAddr = flag.String("dbAddr", "127.0.0.1:6379", "The address of the redis server")
+	dbPass = flag.String("password", "12345", "The password of the Kubernetes API server")
+	addr   = flag.String("addr", ":4000", "Port Value")
+)
 
 func main() {
 
-	addr := flag.String("addr", ":4000", "Port Value")
 	flag.Parse()
 
-	app := &application{
-		Mkstask: mksresource{
-			Created:   12,
-			Active:    23,
-			Failed:    34,
-			Completed: 45,
-			Deleted:   56,
-		},
-		Mkspipelinerun: mksresource{
-			Created:   12,
-			Active:    23,
-			Failed:    34,
-			Completed: 45,
-			Deleted:   56,
-		},
-		Mkstaskrun: mksresource{
-			Created:   12,
-			Active:    23,
-			Failed:    34,
-			Completed: 45,
-			Deleted:   56,
-		},
+	// redis-db client
+	cred := db.RClient{
+		Addr: *dbAddr,
+		Pass: *dbPass,
+		Db:   0,
+	}
+	rClient := db.GetRedisClient(&cred)
+	dapp, err := db.GetValues(rClient)
+	// fmt.Print(dapp)
+	app := (*wrap)(dapp)
+	fmt.Print(app)
+	if err != nil {
+		log.Fatalf("Couldn't get the values from the source")
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.homePage)
+	mux.HandleFunc("/", app.HomePage)
 
-	fileServer := http.FileServer(http.Dir("./ui/static"))
+	// fileServer := http.FileServer(http.Dir("./ui/static"))
 
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	// mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
 	log.Printf("Starting server on %s\n", *addr)
-	err := http.ListenAndServe(*addr, mux)
-	log.Fatal(err)
+	er := http.ListenAndServe(*addr, mux)
+	log.Fatal(er)
 }
