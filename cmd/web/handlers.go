@@ -4,9 +4,13 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/MiniTeks/mks-ui/pkg/db"
 )
 
-func (app *application) homePage(w http.ResponseWriter, r *http.Request) {
+type wrap db.Application
+
+func (app *wrap) HomePage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -26,7 +30,7 @@ func (app *application) homePage(w http.ResponseWriter, r *http.Request) {
 
 	if tpl.Execute(w, app) != nil {
 		log.Println(err.Error())
-		http.Error(w, "Template couldn't be parsed", 500)
+		http.Error(w, "Template couldn't be executed", 500)
 		return
 	}
 }
