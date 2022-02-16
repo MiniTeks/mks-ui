@@ -30,7 +30,7 @@ func GetValue(rClient *redis.Client, key string) string {
 
 // GetValues returns the keys in the Application struct using the GetValue function.
 func GetValues(rClient *redis.Client) (*Application, error) {
-	dataPoint := []string{"CREATED", "DELETED", "ACTIVE", "FAILED", "COMPLETED"}
+	dataPoint := []string{"CREATED", "ACTIVE", "FAILED", "COMPLETED", "DELETED"}
 	resources := []string{"MKSTASK", "MKSTASKRUN", "MKSPIPELINERUN"}
 	ans := [3]Mksresource{}
 	for j, r := range resources {
@@ -41,10 +41,10 @@ func GetValues(rClient *redis.Client) (*Application, error) {
 		}
 		ans[j] = Mksresource{
 			Created:   resArr[0],
-			Deleted:   resArr[1],
-			Active:    resArr[2],
-			Failed:    resArr[3],
-			Completed: resArr[4],
+			Deleted:   resArr[4],
+			Active:    resArr[1],
+			Failed:    resArr[2],
+			Completed: resArr[3],
 		}
 	}
 	res := &Application{
