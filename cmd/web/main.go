@@ -23,6 +23,7 @@ import (
 	"net/http"
 
 	"github.com/MiniTeks/mks-ui/pkg/db"
+	"github.com/go-redis/redis/v8"
 )
 
 var (
@@ -30,6 +31,8 @@ var (
 	dbPass = flag.String("password", "12345", "The password of the Kubernetes API server")
 	addr   = flag.String("addr", ":5000", "Port Value")
 )
+
+var rClient *redis.Client
 
 func main() {
 
@@ -42,20 +45,15 @@ func main() {
 		Db:   0,
 	}
 
-	rClient := db.GetRedisClient(&cred)
-	dapp, err := db.GetValues(rClient)
-	if err != nil {
-		log.Fatalf("Couldn't get the values from the source")
-	}
-	app := (*wrap)(dapp)
+	rClient = db.GetRedisClient(&cred)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.HomePage)
+	mux.HandleFunc("/", HomePage)
 
 	// fileServer := http.FileServer(http.Dir("./ui/static"))
 	// mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	log.Printf("Starting server on %s\n", *addr)
+	log.Printf("Starting server on localhost%s\n", *addr)
 	er := http.ListenAndServe(*addr, mux)
 	log.Fatal(er)
 }

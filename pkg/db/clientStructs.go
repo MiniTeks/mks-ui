@@ -26,7 +26,6 @@ type RClient struct {
 // Mksresource struct stores the count of the resources.
 type Mksresource struct {
 	Created   string // resource created
-	Active    string // resources active currently
 	Failed    string // resource failed
 	Completed string // resource completed
 	Deleted   string // resource deleted

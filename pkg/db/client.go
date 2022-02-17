@@ -39,7 +39,7 @@ func GetRedisClient(cred *RClient) *redis.Client {
 	if err != nil {
 		log.Fatal("Couldn't connect to redis-database")
 	}
-	fmt.Print(ping, err)
+	fmt.Println(ping)
 
 	return rdb
 }
