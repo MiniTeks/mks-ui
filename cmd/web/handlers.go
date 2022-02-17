@@ -25,13 +25,9 @@ import (
 	"github.com/MiniTeks/mks-ui/pkg/db"
 )
 
-
-// Declare wrap as a wrapper type to the db.Application type to be used in the HomePage.
-type wrap db.Application
-
-// HomePage function parses the templates and then feeds it with the data we 
+// HomePage function parses the templates and then feeds it with the data we
 // need to display.
-func (app *wrap) HomePage(w http.ResponseWriter, r *http.Request) {
+func HomePage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -48,8 +44,14 @@ func (app *wrap) HomePage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Template couldn't be parsed", 500)
 		return
 	}
+	
+	// get values from the database
+	dapp, err := db.GetValues(rClient)
+	if err != nil {
+		log.Fatalf("Couldn't get the values from the source")
+	}
 
-	if tpl.Execute(w, app) != nil {
+	if tpl.Execute(w, dapp) != nil {
 		http.Error(w, "Template couldn't be executed", 500)
 		return
 	}
